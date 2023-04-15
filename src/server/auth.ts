@@ -4,7 +4,7 @@ import {
   type NextAuthOptions,
   type DefaultSession,
 } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
+import GitlabProvider from "next-auth/providers/gitlab";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
@@ -47,9 +47,19 @@ export const authOptions: NextAuthOptions = {
   },
   adapter: PrismaAdapter(prisma),
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+    GitlabProvider({
+      name: "Magenta CICD",
+      clientId: env.GITLAB_CLIENT_ID,
+      clientSecret: env.GITLAB_CLIENT_SECRET,
+
+      authorization: {
+        url: "https://gitlab.devops.telekom.de/oauth/authorize",
+      },
+      token: "https://gitlab.devops.telekom.de/oauth/token",
+      userinfo: "https://gitlab.devops.telekom.de/api/v4/user",
+      httpOptions: {
+        timeout: 15_000,
+      },
     }),
     /**
      * ...add more providers here.
