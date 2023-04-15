@@ -7,6 +7,7 @@
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
+  output: "standalone",
 
   /**
    * If you have the "experimental: { appDir: true }" setting enabled, then you
