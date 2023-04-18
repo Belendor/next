@@ -38,6 +38,12 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
+    jwt: ({ token, user }) => {
+      if(user) {
+        token.id = user.id
+      }
+      return token
+    },
     session: ({ session, user }) => ({
       ...session,
       user: {
@@ -45,6 +51,13 @@ export const authOptions: NextAuthOptions = {
         id: user.id,
       },
     }),
+    // session: ({ session, token }) => ({
+    //   if (token) {
+    //     session.user.id = token.id
+    //   }
+    //   return session
+
+    // }),
   },
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -73,13 +86,35 @@ export const authOptions: NextAuthOptions = {
         username: { label: "Username", type: "text", placeholder: "" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) { // req)
         // You need to provide your own logic here that takes the credentials
         // submitted and returns either a object representing a user or value
         // that is false/null if the credentials are invalid.
         // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
         // You can also use the `req` object to obtain additional parameters
         // (i.e., the request IP address)
+
+        if (credentials?.username === process.env.EMERGENCY_USERNAME && credentials?.password === process.env.EMERGENCY_PASSWORD) {
+
+          const user = await prisma.user.findUnique({
+            where: {
+              email: credentials?.username,
+            },
+          });
+          if (!user) {
+            throw new Error("User not found");
+          }
+
+          return { 
+            id: 2,
+            name: 'Emergency User', // placeholder
+            email: "emergency@email.com" // placeholder
+          }
+        }
+
+        // login failed
+        return null
+
         const res = await fetch("/your/endpoint", {
           method: 'POST',
           body: JSON.stringify(credentials),
