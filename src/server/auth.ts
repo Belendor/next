@@ -6,7 +6,7 @@ import {
 } from "next-auth";
 import GitlabProvider from "next-auth/providers/gitlab";
 import { prisma } from "~/server/db";
-import CredentialsProvider from "next-auth/providers/credentials"
+import CredentialsProvider from "next-auth/providers/credentials";
 import { env } from "~/env.mjs";
 
 /**
@@ -53,16 +53,16 @@ export const authOptions: NextAuthOptions = {
       },
     }),
     CredentialsProvider({
-
-      
       name: "Credentials",
       credentials: {
         username: { label: "Username", type: "text", placeholder: "" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        if (credentials?.username === process.env.EMERGENCY_USERNAME && credentials?.password === process.env.EMERGENCY_PASSWORD) {
-
+        if (
+          credentials?.username === process.env.EMERGENCY_USERNAME &&
+          credentials?.password === process.env.EMERGENCY_PASSWORD
+        ) {
           const user = await prisma.user.findUnique({
             where: {
               email: credentials?.username,
@@ -71,13 +71,13 @@ export const authOptions: NextAuthOptions = {
           if (!user) {
             throw new Error("User not found");
           }
-          console.debug(user)
+          console.debug(user);
 
-          return user
+          return user;
         }
 
         // login failed
-        return null
+        return null;
       },
     }),
   ],
