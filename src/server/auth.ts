@@ -8,6 +8,7 @@ import GitlabProvider from "next-auth/providers/gitlab";
 import { prisma } from "~/server/db";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { env } from "~/env.mjs";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -80,7 +81,10 @@ export const authOptions: NextAuthOptions = {
         return null;
       },
     }),
+
   ],
+  adapter: PrismaAdapter(prisma),
+  session: {strategy: "jwt"},
 };
 
 /**
